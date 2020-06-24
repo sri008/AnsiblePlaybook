@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: UnInstall httpd
+      service: 
+        name=httpd
+        state=stopped
+      notify:
+        - remove httpd
+  handlers:
+    - name: remove httpd
+      yum: name=httpd state=removed

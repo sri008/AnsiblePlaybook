@@ -1,0 +1,10 @@
+---
+- hosts: all
+  tasks:
+    - name: list the files
+      shell: ls -ltr /opt/
+      register: foo
+
+    - name: Output
+      debug:
+        msg: "{{ foo}}"

@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Install httpd 
+      yum: 
+        name=httpd
+        state=present
+        become: yes
+      notify:
+        - start httpd
+  handlers:
+    - name: start httpd
+      service: name=httpd state=started
+      become: yes

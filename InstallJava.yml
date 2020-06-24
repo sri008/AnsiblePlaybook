@@ -1,0 +1,42 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Get jdk package
+      get_url:
+        url: https://dependencies001.s3.amazonaws.com/jdk-8u212-linux-x64.tar.gz
+        dest: /opt/
+
+    - name: Unzip tar file
+      become: yes
+      become_user: root
+      unarchive:
+        src: /opt/jdk-8u212-linux-x64.tar.gz
+        dest: /opt/
+        remote_src: yes
+    - name: alternative 1
+      command: alternatives --install /usr/bin/java java /opt/jdk1.8.0_212/bin/java 2
+
+    - name: alternative 2
+      command: alternatives --set java /opt/jdk1.8.0_212/bin/java
+
+    - name: alternative 3
+      command: alternatives --install /usr/bin/jar jar /opt/jdk1.8.0_212/bin/jar 2
+
+    - name: alternative 4
+      command: alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_212/bin/javac 2
+    - name: alternative 5
+      command: alternatives --set jar /opt/jdk1.8.0_212/bin/jar
+    - name: alternative 6
+      command: alternatives --set javac /opt/jdk1.8.0_212/bin/javac
+
+    - name: Set environment
+      blockinfile:
+        path: /etc/environment
+        block: |
+          export JAVA_HOME=/opt/jdk1.8.0_212
+          export JRE_HOME=/opt/jdk1.8.0_212/jre
+          export PATH=$PATH:/opt/jdk1.8.0_212/bin:/opt/jdk1.8.0_212/jre/bin
+    - name: reload Env file
+      shell: source /etc/environment

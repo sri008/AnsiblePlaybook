@@ -1,0 +1,8 @@
+---
+- hosts: all
+  vars:
+    greeting: Heloo world
+  tasks:
+    - name: Output
+      debug:
+        msg: "{{ greeting }}"

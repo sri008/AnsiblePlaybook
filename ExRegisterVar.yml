@@ -1,0 +1,8 @@
+---
+- hosts: all
+  tasks:
+    - shell: ls -l /opt
+      register: foo
+    - name: result
+        debug:
+        msg: "{{ foo  }}"

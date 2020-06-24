@@ -1,0 +1,8 @@
+---
+- hosts: all
+  name: this is heloo world
+  tasks:
+    - name: create file
+      copy:
+        content: heloo from master node
+        dest: /tmp/heloo world

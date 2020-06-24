@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Get jdk package
+      get_url:
+        url: https://dependencies001.s3.amazonaws.com/jdk-8u212-linux-x64.tar.gz
+        dest: /opt/
+
+    - name: Unzip tar file
+      become: yes
+      become_user: root
+      unarchive:
+        src: /opt/jdk-8u212-linux-x64.tar.gz
+        dest: /opt/
+        remote_src: yes

@@ -1,0 +1,8 @@
+---
+- hosts: all
+  vars:
+    foo: hellooo var
+  tasks:
+    - name: Test var 
+      debug: 
+        msg: "{{ foo }}"
