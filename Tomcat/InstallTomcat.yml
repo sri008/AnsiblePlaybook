@@ -1,0 +1,42 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+    tomcat_version: 9.0.36
+  tasks:
+    - name: Get tomcat zip file
+      get_url:
+        url: http://mirrors.estointernet.in/apache/tomcat/tomcat-{{tomcat_version.split('.')[0]}}/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz
+        dest: /opt/
+      become: yes
+      become_user: root
+    - name: Extract the file
+      become: yes
+      unarchive:
+        src: /opt/apache-tomcat-{{tomcat_version}}.tar.gz
+        dest: /opt/
+        remote_src: yes
+    - name: Configure Tomcat User
+      template:
+        src: tomcat-user.xml.j2
+        dest: "/opt/apache-tomcat-{{ tomcat_version }}/conf/tomcat-users.xml"
+    - name: Configure context
+      template:
+        src: context.xml.j2
+        dest: "/opt/apache-tomcat-{{ tomcat_version }}/webapps/manager/META-INF/context.xml"
+    - name: Set the env
+      template:
+        src: setenv.sh.j2
+        dest: "/opt/apache-tomcat-{{ tomcat_version }}/bin/setenv.sh"
+    - name: Setup as service
+      template:
+        src: tomcat.service.j2
+        dest: /etc/systemd/system/tomcat.service
+    - name: reload
+      systemd:
+        daemon_reload: yes
+    - name: Start as Service
+      systemd:
+        name: tomcat
+        state: started
