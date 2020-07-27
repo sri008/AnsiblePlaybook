@@ -1,0 +1,44 @@
+---
+#Deploy DB script in UAT 
+- name: Export war to UAT environment
+  hosts: UAT
+  become: yes
+  tasks:
+    - name: Download Script 
+      get_url:
+        url: https://raw.githubusercontent.com/sri008/dbMForexpay/master/latestPackage.sh
+        dest: /opt
+    - name: Make it executable
+      file:
+        path: /opt/latestPackage.sh
+        mode: '777'
+    - name: Run the script to download latest Package
+      script: 
+        cmd: /bin/sh /opt/latestPackage.sh
+      args:
+        chdir: /opt/UAT/
+    - name: change file permission
+      command: "chmod -R 777 /opt/UAT/"
+      become: yes
+    - name: Download Application Properties
+      get_url:
+        url: https://raw.githubusercontent.com/sri008/dbMForexpay/master/src/main/resources/application-uat.properties
+        dest: /opt/UAT
+    - name: change the permission of properties files
+      file:
+        path: /opt/UAT/application-uat.properties
+        mode: '644'
+    - name: pull database script
+      get_url:
+        url: https://raw.githubusercontent.com/sri008/dbMForexpay/master/src/main/resources/db/migration/V1__Create_team_table.sql
+        dest: /opt/UAT/
+    #- name: pull database script
+      #get_url:
+        #url: https://raw.githubusercontent.com/sri008/dbMForexpay/master/src/main/resources/db/migration/V2__Add_peope.sql
+        #dest: /opt/UAT/
+    - name: Export Java Node Cookie
+      shell: nohup java -jar /opt/UAT/*.jar --spring.config.location=file:/opt/UAT/application-uat.properties &
+      become: yes
+    #- name: run the swagger
+     # shell: nohup java -jar /opt/SIT/*.jar &
+     # become: yes

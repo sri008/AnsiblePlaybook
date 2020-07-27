@@ -1,0 +1,9 @@
+# It will deploy war file
+- name: Export War file
+  hosts: all
+  become: yes
+  tasks:
+    - name: copy war to tomcat machine
+      copy:
+        src: /home/ansiblec/testwar/target/demo-0.0.1.war
+        dest: /opt/apache-tomcat-9.0.36/webapps/

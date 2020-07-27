@@ -1,0 +1,44 @@
+---
+#Deploy DB script in SIT 
+- name: Export war to SIT environment
+  hosts: SIT
+  become: yes
+  tasks:
+    - name: Download Script 
+      get_url:
+        url: https://raw.githubusercontent.com/sri008/dbMForexpay/master/latestPackage.sh
+        dest: /opt
+    - name: Make it executable
+      file:
+        path: /opt/latestPackage.sh
+        mode: '777'
+    - name: Run the script to download latest Package
+      script: 
+        cmd: /bin/sh /opt/latestPackage.sh
+      args:
+        chdir: /opt/SIT/
+    - name: change file permission
+      command: "chmod -R 777 /opt/SIT/"
+      become: yes
+    - name: Download Application Properties
+      get_url:
+        url: https://raw.githubusercontent.com/sri008/dbMForexpay/master/src/main/resources/application-sit.properties
+        dest: /opt/SIT
+    - name: change the permission of properties files
+      file:
+        path: /opt/SIT/application-sit.properties
+        mode: '644'
+    - name: pull database script
+      get_url:
+        url: https://raw.githubusercontent.com/sri008/dbMForexpay/master/src/main/resources/db/migration/V1__Create_team_table.sql
+        dest: /opt/SIT/
+    #- name: pull database script
+      #get_url:
+        #url: https://raw.githubusercontent.com/sri008/dbMForexpay/master/src/main/resources/db/migration/V2__Add_people.sql
+        #dest: /opt/SIT/
+    - name: Export Java Node Cookie
+      shell: nohup java -jar /opt/SIT/*.jar --spring.config.location=file:/opt/SIT/application-sit.properties &
+      become: yes
+    #- name: run the swagger
+     # shell: nohup java -jar /opt/SIT/*.jar &
+     # become: yes
